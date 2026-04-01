@@ -3,6 +3,8 @@ package com.jdpadillavigo.spring_boot_crash_course.controllers
 import com.jdpadillavigo.spring_boot_crash_course.controllers.NoteController.NoteResponse
 import com.jdpadillavigo.spring_boot_crash_course.database.model.Note
 import com.jdpadillavigo.spring_boot_crash_course.database.repository.NoteRepository
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import org.bson.types.ObjectId
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
 
@@ -26,10 +27,10 @@ class NoteController(
 ) {
     data class NoteRequest(
         val id: String?,
+        @field:NotBlank(message = "Title can't be blank")
         val title: String,
         val content: String,
-        val color: Long,
-        val ownerId: String?
+        val color: Long
     )
 
     data class NoteResponse(
@@ -42,7 +43,7 @@ class NoteController(
 
     @PostMapping
     fun save(
-        @RequestBody body: NoteRequest
+        @Valid @RequestBody body: NoteRequest
     ): NoteResponse {
         val ownerId = SecurityContextHolder.getContext().authentication!!.principal as String
         val note = repository.save(
