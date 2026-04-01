@@ -5,6 +5,7 @@ import com.jdpadillavigo.spring_boot_crash_course.database.model.User
 import com.jdpadillavigo.spring_boot_crash_course.database.repository.RefreshTokenRepository
 import com.jdpadillavigo.spring_boot_crash_course.database.repository.UserRepository
 import org.bson.types.ObjectId
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.stereotype.Service
@@ -27,6 +28,10 @@ class AuthService(
     )
 
     fun register(email: String, password: String): User {
+        val user = userRepository.findByEmail(email.trim())
+        if(user != null) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "An user with that email already exists")
+        }
         return userRepository.save(
             User(
                 email = email,
